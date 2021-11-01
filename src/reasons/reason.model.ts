@@ -8,7 +8,7 @@ export const ReasonSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-export interface Reason {
+export interface Reason extends mongoose.Document {
     id: string;
     name: string,
     description: string,

@@ -25,19 +25,22 @@ export class ReasonService{
         return result;
     }
 
-    getByName(name : string){
-        return this.reasonRepository.getByName(name);
+    async getByName(name : string){
+        const result = await this.reasonRepository.getByName(name);
+        console.log(result);
+        return result;
     }
 
-    update(
+    async update(
+        id: string,
         name : string,
         description : string,
     ){
-        return this.reasonRepository.update(name,description);
+        return await this.reasonRepository.update(id, name, description);
     }
 
-    delete(id : string) {
-        return this.reasonRepository.delete(id);
+    async delete(id : string) {
+        return await this.reasonRepository.delete(id);
     }
 
 }

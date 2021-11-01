@@ -36,23 +36,25 @@ import {
         return reason;
     }
 
-    @Get(':name')
-    getByName(@Param('name') name : string,) {
-        
+    @Get('/name/:name')
+    async getByName(@Param('name') name : string,) {
+        const reason = await this.reasonsService.getByName(name);
+        return reason;
     }
 
     @Patch(':id')
-    update(
+    async update(
         @Param('id') id : string,
         @Body('name') name : string,
         @Body('description') description : string
     ){
-        //invoke service
+        await this.reasonsService.update(id, name, description);
+        return null;
     }
 
     @Delete(':id')
-    delete(@Param('id') id : string){
-        //invoke service
+    async delete(@Param('id') id : string){
+        return await this.reasonsService.delete(id);
     }
 
   }
