@@ -17,13 +17,13 @@ export class AbsenceController{
 
     @Post()
     async create(
-        @Body('reason_id') reason_id: string,
+        @Body('reasons') reasons: string,
         @Body('description') description: string,
-        @Body('date_from') date_from: Date,
-        @Body('date_to') date_to: Date,        
+        @Body('date_from') date_from: string,
+        @Body('date_to') date_to: string,        
     ){
         const genId = await this.absenceService.create(
-            reason_id,
+            reasons,
             description,
             date_from,
             date_to
@@ -41,14 +41,10 @@ export class AbsenceController{
         return await this.absenceService.getById(id);
     }
 
-    @Get('/reason/:name')
-    async getByReasonName(@Param('name')name : string){
-        return await this.absenceService.getByReasonName(name);
-    }
-
     @Patch(':id')
     async update(
         @Param('id') id : string,
+        @Body('reasons') reasons : string,
         @Body('description') description: string,
         @Body('observation') observation: string,
         @Body('date_from') date_from: Date,
@@ -57,6 +53,7 @@ export class AbsenceController{
     ){
         await this.absenceService.update(
             id,
+            reasons,
             description,
             observation,
             date_from,

@@ -6,28 +6,31 @@ import { Model } from 'mongoose';
 @Injectable()
 export class AbsenceRepository{
 
+    static readonly ABSENCE_NOT_FOUND = 'Absence not found';
+
     constructor(@InjectModel('Absence') private readonly absenceModel : Model<Absence>) {}
 
     private async find(id : string): Promise<Absence>{
         let absence;
         try{
             absence = await this.absenceModel.findById(id).exec();
+            console.log("absence => " + absence);
         }catch(error){
-            throw new NotFoundException('Absence not found');
+            throw new NotFoundException(AbsenceRepository.ABSENCE_NOT_FOUND);
         }
-        if(!absence) { throw new NotFoundException('Absence not found')}
+        if(!absence) { throw new NotFoundException(AbsenceRepository.ABSENCE_NOT_FOUND)}
         return absence;
     }
 
     async create(
-        reason_id: string,
+        reasons: string,
         description: string,
         date_from: Date,
         date_to: Date
     ){
-        console.log("Chegou no repository do create");
+        console.log('date_from => ' + date_from);
         const newAbsence = new this.absenceModel({
-            reason_id,
+            reasons,
             description,
             date_from,
             date_to
@@ -52,13 +55,7 @@ export class AbsenceRepository{
     }
 
     async getById(id: string){
-        let absence;
-        try {
-            absence = await this.find(id);
-        } catch (error) {
-            throw new NotFoundException('Absence not found');
-        }
-        if(!absence) { throw new NotFoundException('Absence not found')}
+        const absence = await this.find(id);
         return {
             id: absence.id,
             description: absence.description,
@@ -68,33 +65,44 @@ export class AbsenceRepository{
             approved: absence.approved,
             certificate: absence.certificate,
             status: absence.status
-        }
-    }
-
-    async getByReasonName(name : string){
-        
+        }        
     }
 
     async update(
-        reason_id: string,
+        id: string,
+        reasons: string,
         description: string,
         observation: string,
         date_from: Date,
         date_to: Date,
         certificate: boolean,
     ){
-
+        const reason = await this.find(id);
+        reason.reasons = reasons;
+        reason.description = description;
+        reason.observation = observation;
+        reason.date_from = date_from;
+        reason.date_to = date_to;
+        reason.certificate = certificate;
+        reason.save();
     }
 
     async updateStatus(id, status){
-        
+        const reason = await this.find(id);
+        reason.status = status;
+        reason.save();
     }    
 
     async updateApproved(id, approved){
-
+        const reason = await this.find(id);
+        reason.approved = approved;
+        reason.save();
     }
 
     async delete(id: string){
-
+        const result = await this.absenceModel.deleteOne({_id: id}).exec();
+        if (result.deletedCount === 0){
+            throw new NotFoundException(AbsenceRepository.ABSENCE_NOT_FOUND);
+        }
     }
 }
