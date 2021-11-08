@@ -1,80 +1,108 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable,NotFoundException } from "@nestjs/common";
 import { AbsenceRepository } from "./absence.repository";
 
 @Injectable()
 export class AbsenceService{
 
+    static readonly ABSENCE_NOT_FOUND = 'Absence not found';
+    static readonly REASONID_FIELD_IS_EMPTY = 'reasons field is empty';
+    static readonly DESCRIPTION_FIELD_IS_EMPTY = 'description field is empty';
+    static readonly DATEFROM_FIELD_IS_EMPTY = 'date_from field is empty';
+    static readonly DATETO_FIELD_IS_EMPTY = 'date_to field is empty';
+    static readonly DATEFROM_INVALID = 'Date from is invalid';
+    static readonly DATETO_INVALID = 'Date to is invalid';
+
     constructor(private readonly absenceRepository : AbsenceRepository){}
 
     /**
-     * Invokes the repository to create a new absence
-     * 
-     * @param reason_id 
-     * @param description 
-     * @param date_from 
-     * @param date_to 
-     * @returns 
      * @TODO check if date_to is igual or greater to date_from
-     * @TODO check if is there any other register with the same "data"
      */
     async create(
-        reason_id: string,
+        reasons: string,
         description: string,
-        date_from: Date,
-        date_to: Date        
+        date_from: string,
+        date_to: string        
     ){
-        //adicionar o try cat aqui... e não no repositório
-        const result = await this.absenceRepository.create(
-            reason_id,
+        if(await this.isAbsenceValidated(
+            reasons,
             description,
             date_from,
             date_to
-        );
-        return result;
+        )){
+            const result = await this.absenceRepository.create(
+                reasons,
+                description,
+                new Date(date_from),
+                new Date(date_to)
+            );
+            return result;
+        }
     }
 
-    /**
-     * Invoke repository to get all absences
-     * 
-     * @returns 
-     */
+    private async isAbsenceValidated(
+        reasons: string,
+        description: string,
+        date_from: string,
+        date_to: string,    
+    ){
+        if(!reasons){
+            throw new BadRequestException(AbsenceService.REASONID_FIELD_IS_EMPTY);
+        }
+        if(!description){
+            throw new BadRequestException(AbsenceService.DESCRIPTION_FIELD_IS_EMPTY);
+        }
+        if(!date_from){
+            throw new BadRequestException(AbsenceService.DATEFROM_FIELD_IS_EMPTY);
+        }
+        if(!date_to){
+            throw new BadRequestException(AbsenceService.DATETO_FIELD_IS_EMPTY);
+        }    
+        try {
+            const dafrom = new Date(date_from);            
+            if(isNaN(dafrom.valueOf())){
+                throw new BadRequestException(AbsenceService.DATEFROM_INVALID);
+            }      
+        } catch (error) {
+            throw new BadRequestException(AbsenceService.DATEFROM_INVALID);
+        }
+        try {
+            const dato = new Date(date_to);            
+            if(isNaN(dato.valueOf())){
+                throw new BadRequestException(AbsenceService.DATETO_INVALID);
+            }  
+        } catch (error) {
+            throw new BadRequestException(AbsenceService.DATETO_INVALID);
+        }        
+        return true;
+    }    
+
     async getAll(){
         return await this.absenceRepository.getAll();
     }
 
-    /**
-     * Invoke the repository to get absence by id
-     * 
-     * @param id 
-     * @returns 
-     */
     async getById(id: string){
-        return await this.absenceRepository.getById(id);
-    }
-
-    /**
-     * Invoke the repository to get absences by the reason name
-     * 
-     * @param name 
-     * @returns 
-     */
-    async getByReasonName(name : string){
-        return await this.absenceRepository.getByReasonName(name);
+        let absence;
+        try {
+            absence = await this.absenceRepository.getById(id);
+        } catch (error) {
+            throw new NotFoundException(AbsenceService.ABSENCE_NOT_FOUND);
+        }
+        if(!absence) { throw new NotFoundException(AbsenceService.ABSENCE_NOT_FOUND)}
+        return {
+            id: absence.id,
+            description: absence.description,
+            observation: absence.observation,
+            date_from: absence.date_from,
+            date_to: absence.date_to,
+            approved: absence.approved,
+            certificate: absence.certificate,
+            status: absence.status
+        }
     }
     
-    /**
-     * Invoke the repository to update an absence
-     * 
-     * @param reason_id 
-     * @param description 
-     * @param observation 
-     * @param date_from 
-     * @param date_to 
-     * @param certificate 
-     * @returns 
-     */
     async update(
-        reason_id: string,
+        id: string,
+        reasons: string,
         description: string,
         observation: string,
         date_from: Date,
@@ -82,7 +110,8 @@ export class AbsenceService{
         certificate: boolean,
     ){
         return await this.absenceRepository.update(
-            reason_id,
+            id,
+            reasons,
             description,
             observation,
             date_from,
@@ -91,34 +120,14 @@ export class AbsenceService{
         );
     }
 
-    /**
-     * Invoke the repository to update the column status
-     * 
-     * @param id 
-     * @param status 
-     * @returns 
-     */
     async updateStatus(id, status){
         return await this.absenceRepository.updateStatus(id, status);
     }
 
-    /**
-     * Invoke the repository to update the approved column
-     * 
-     * @param id 
-     * @param approved 
-     * @returns 
-     */
     async updateApproved(id, approved){
         return await this.absenceRepository.updateApproved(id, approved);
     }    
 
-    /**
-     * Invoke the repository to delete an absence
-     * 
-     * @param id 
-     * @returns 
-     */
     async delete(id: string){
         return await this.absenceRepository.delete(id);
     }    
