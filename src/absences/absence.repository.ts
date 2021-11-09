@@ -14,7 +14,6 @@ export class AbsenceRepository{
         let absence;
         try{
             absence = await this.absenceModel.findById(id).exec();
-            console.log("absence => " + absence);
         }catch(error){
             throw new NotFoundException(AbsenceRepository.ABSENCE_NOT_FOUND);
         }
@@ -28,7 +27,6 @@ export class AbsenceRepository{
         date_from: Date,
         date_to: Date
     ){
-        console.log('date_from => ' + date_from);
         const newAbsence = new this.absenceModel({
             reasons,
             description,
@@ -42,7 +40,7 @@ export class AbsenceRepository{
     async getAll(){
         const absences = await this.absenceModel.find().exec();
         return absences.map(
-            abs => ({
+            abs => ({                
                 id: abs.id,
                 description: abs.description,
                 observation: abs.observation,
@@ -50,7 +48,8 @@ export class AbsenceRepository{
                 date_to: abs.date_to,
                 approved: abs.approved,
                 certificate: abs.certificate,
-                status: abs.status
+                status: abs.status,
+                reasons: abs.reasons
             }));
     }
 
@@ -64,7 +63,8 @@ export class AbsenceRepository{
             date_to: absence.date_to,
             approved: absence.approved,
             certificate: absence.certificate,
-            status: absence.status
+            status: absence.status,
+            reasons: absence.reasons
         }        
     }
 
@@ -77,26 +77,26 @@ export class AbsenceRepository{
         date_to: Date,
         certificate: boolean,
     ){
-        const reason = await this.find(id);
-        reason.reasons = reasons;
-        reason.description = description;
-        reason.observation = observation;
-        reason.date_from = date_from;
-        reason.date_to = date_to;
-        reason.certificate = certificate;
-        reason.save();
+        const absence = await this.find(id);
+        absence.reasons = reasons;
+        absence.description = description;
+        absence.observation = observation;
+        absence.date_from = date_from;
+        absence.date_to = date_to;
+        absence.certificate = certificate;
+        absence.save();
     }
 
     async updateStatus(id, status){
-        const reason = await this.find(id);
-        reason.status = status;
-        reason.save();
+        const absence = await this.find(id);
+        absence.status = status;
+        absence.save();
     }    
 
     async updateApproved(id, approved){
-        const reason = await this.find(id);
-        reason.approved = approved;
-        reason.save();
+        const absence = await this.find(id);
+        absence.approved = approved;
+        absence.save();
     }
 
     async delete(id: string){
