@@ -82,5 +82,4 @@ export class ReasonRepository{
             throw new NotFoundException(ReasonRepository.REASON_NOT_FOUND);
         }
     }
-
 }
