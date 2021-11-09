@@ -11,12 +11,10 @@ export class AbsenceService{
     static readonly DATETO_FIELD_IS_EMPTY = 'date_to field is empty';
     static readonly DATEFROM_INVALID = 'Date from is invalid';
     static readonly DATETO_INVALID = 'Date to is invalid';
+    static readonly DATE_FROM_GREATER_THAN_DATE_TO = 'Date from is greater than Date to';
 
     constructor(private readonly absenceRepository : AbsenceRepository){}
 
-    /**
-     * @TODO check if date_to is igual or greater to date_from
-     */
     async create(
         reasons: string,
         description: string,
@@ -39,6 +37,10 @@ export class AbsenceService{
         }
     }
 
+    /**
+     * 
+     * @TODO search for a lib to provide validators instead of tons of IFs..
+     */
     private async isAbsenceValidated(
         reasons: string,
         description: string,
@@ -72,7 +74,10 @@ export class AbsenceService{
             }  
         } catch (error) {
             throw new BadRequestException(AbsenceService.DATETO_INVALID);
-        }        
+        }    
+        if(date_from > date_to){
+            throw new BadRequestException(AbsenceService.DATE_FROM_GREATER_THAN_DATE_TO);
+        }    
         return true;
     }    
 
@@ -96,6 +101,7 @@ export class AbsenceService{
             date_to: absence.date_to,
             approved: absence.approved,
             certificate: absence.certificate,
+            reasons: absence.reasons,
             status: absence.status
         }
     }
@@ -105,19 +111,26 @@ export class AbsenceService{
         reasons: string,
         description: string,
         observation: string,
-        date_from: Date,
-        date_to: Date,
+        date_from: string,
+        date_to: string,
         certificate: boolean,
     ){
-        return await this.absenceRepository.update(
-            id,
+        if(await this.isAbsenceValidated(
             reasons,
             description,
-            observation,
             date_from,
-            date_to,
-            certificate,
-        );
+            date_to
+        )){
+            return await this.absenceRepository.update(
+                id,
+                reasons,
+                description,
+                observation,
+                new Date(date_from),
+                new Date(date_to),
+                certificate,
+            );
+        }
     }
 
     async updateStatus(id, status){
