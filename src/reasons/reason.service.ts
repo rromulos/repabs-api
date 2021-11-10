@@ -1,11 +1,13 @@
-import { Injectable, HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
+import { Injectable, HttpException, HttpStatus, NotFoundException, BadRequestException } from "@nestjs/common";
 import { ReasonRepository } from "./reason.repository";
 
 @Injectable()
 export class ReasonService{
 
     static readonly REASON_NOT_FOUND = 'Reason not found';
-    static readonly READON_ALREADY_EXISTS = 'The reason already exists';
+    static readonly REASON_ALREADY_EXISTS = 'The reason already exists';
+    static readonly NAME_FIELD_IS_EMPTY = 'Name field is empty';
+    static readonly DESCRIPTION_FIELD_IS_EMPTY = 'Description field is empty';
 
     constructor(private readonly reasonRepository : ReasonRepository){}
 
@@ -14,9 +16,13 @@ export class ReasonService{
         description : string,
     ){
         if(await this.doesReasonExists(name)){             
-              throw new HttpException(ReasonService.READON_ALREADY_EXISTS, HttpStatus.AMBIGUOUS);
+              throw new HttpException(ReasonService.REASON_ALREADY_EXISTS, HttpStatus.AMBIGUOUS);
 
-        }else{
+        }
+        if(await this.isReasonValidated(
+            name,
+            description
+        )) {
             const result = await this.reasonRepository.create(name, description);
             return result;
         }
@@ -28,7 +34,6 @@ export class ReasonService{
     }
 
     async getById(id : string){
-
         let reason;
         try {
             reason = await this.reasonRepository.getById(id);        
@@ -63,7 +68,25 @@ export class ReasonService{
         name : string,
         description : string,
     ){
-        return await this.reasonRepository.update(id, name, description);
+        if(await this.isReasonValidated(
+            name,
+            description
+        )) {
+            return await this.reasonRepository.update(id, name, description);
+        }
+    }
+
+    private async isReasonValidated(
+        name : string,
+        description : string
+        ) {
+            if(!name) {
+                throw new BadRequestException(ReasonService.NAME_FIELD_IS_EMPTY);
+            }
+            if(!description) {
+                throw new BadRequestException(ReasonService.DESCRIPTION_FIELD_IS_EMPTY);
+            }
+            return true;
     }
 
     async delete(id : string) {
