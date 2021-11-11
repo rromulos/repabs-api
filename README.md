@@ -1,4 +1,22 @@
 
+# Repabs API (Report Absences)
+
+First project with NestJs and typescript for learning purposes. 
+API to manage absences during the working days.
+This repository contains only the solution for backend.
+
+## Solutions used in the project
+
+- NestJS
+- Mongo / Mongoose
+- Passport
+
+## Features
+
+- Basic user management (list, create, update and delete)
+- Reasons management (list, create, update and delete)
+- Absences management (list, create, update, delete)
+
 ## API Reference
 
 ```
