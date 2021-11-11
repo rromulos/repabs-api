@@ -20,12 +20,14 @@ export class AbsenceController{
     @Post()
     async create(
         @Body('reasons') reasons: string,
+        @Body('users') users : string,
         @Body('description') description: string,
         @Body('date_from') date_from: string,
         @Body('date_to') date_to: string,        
     ){
         const genId = await this.absenceService.create(
             reasons,
+            users,
             description,
             date_from,
             date_to
@@ -50,6 +52,7 @@ export class AbsenceController{
     async update(
         @Param('id') id : string,
         @Body('reasons') reasons : string,
+        @Body('users') users : string,
         @Body('description') description: string,
         @Body('observation') observation: string,
         @Body('date_from') date_from: string,
@@ -59,6 +62,7 @@ export class AbsenceController{
         await this.absenceService.update(
             id,
             reasons,
+            users,
             description,
             observation,
             date_from,

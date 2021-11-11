@@ -12,23 +12,27 @@ export class AbsenceService{
     static readonly DATEFROM_INVALID = 'Date from is invalid';
     static readonly DATETO_INVALID = 'Date to is invalid';
     static readonly DATE_FROM_GREATER_THAN_DATE_TO = 'Date from is greater than Date to';
+    static readonly USER_FIELD_IS_EMPTY = 'User field is empty';
 
     constructor(private readonly absenceRepository : AbsenceRepository){}
 
     async create(
         reasons: string,
+        users: string,
         description: string,
         date_from: string,
         date_to: string        
     ){
         if(await this.isAbsenceValidated(
             reasons,
+            users,
             description,
             date_from,
             date_to
         )){
             const result = await this.absenceRepository.create(
                 reasons,
+                users,
                 description,
                 new Date(date_from),
                 new Date(date_to)
@@ -43,6 +47,7 @@ export class AbsenceService{
      */
     private async isAbsenceValidated(
         reasons: string,
+        users: string,
         description: string,
         date_from: string,
         date_to: string,    
@@ -50,6 +55,9 @@ export class AbsenceService{
         if(!reasons){
             throw new BadRequestException(AbsenceService.REASONID_FIELD_IS_EMPTY);
         }
+        if(!users){
+            throw new BadRequestException(AbsenceService.USER_FIELD_IS_EMPTY);
+        }        
         if(!description){
             throw new BadRequestException(AbsenceService.DESCRIPTION_FIELD_IS_EMPTY);
         }
@@ -109,6 +117,7 @@ export class AbsenceService{
     async update(
         id: string,
         reasons: string,
+        users: string,
         description: string,
         observation: string,
         date_from: string,
@@ -117,6 +126,7 @@ export class AbsenceService{
     ){
         if(await this.isAbsenceValidated(
             reasons,
+            users,
             description,
             date_from,
             date_to
@@ -124,6 +134,7 @@ export class AbsenceService{
             return await this.absenceRepository.update(
                 id,
                 reasons,
+                users,
                 description,
                 observation,
                 new Date(date_from),

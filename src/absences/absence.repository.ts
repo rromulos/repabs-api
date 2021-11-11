@@ -23,12 +23,15 @@ export class AbsenceRepository{
 
     async create(
         reasons: string,
+        users: string,
         description: string,
         date_from: Date,
         date_to: Date
     ){
+        console.log("users => " + users);
         const newAbsence = new this.absenceModel({
             reasons,
+            users,
             description,
             date_from,
             date_to
@@ -49,7 +52,8 @@ export class AbsenceRepository{
                 approved: abs.approved,
                 certificate: abs.certificate,
                 status: abs.status,
-                reasons: abs.reasons
+                reasons: abs.reasons,
+                users: abs.users
             }));
     }
 
@@ -64,13 +68,15 @@ export class AbsenceRepository{
             approved: absence.approved,
             certificate: absence.certificate,
             status: absence.status,
-            reasons: absence.reasons
+            reasons: absence.reasons,
+            users: absence.users
         }        
     }
 
     async update(
         id: string,
         reasons: string,
+        users: string,
         description: string,
         observation: string,
         date_from: Date,
@@ -79,6 +85,7 @@ export class AbsenceRepository{
     ){
         const absence = await this.find(id);
         absence.reasons = reasons;
+        absence.users = users;
         absence.description = description;
         absence.observation = observation;
         absence.date_from = date_from;
