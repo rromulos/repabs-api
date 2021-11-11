@@ -180,7 +180,7 @@ Note: Routes are protected by a guard. So the Bearer token must be provided alwa
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `approved`      | `string` | **Required**. Approval (true or false) |
+| `approved`      | `boolean` | **Required**. Approval (true or false) |
 
 
 #### Patch absence (update approved flag)
@@ -192,6 +192,16 @@ Note: Routes are protected by a guard. So the Bearer token must be provided alwa
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
 | `status`      | `string` | **Required**. Status of absence (NEW, IN_PROGRESS, FINISHED) |
+
+#### Patch absence (update certificate)
+
+```http
+  PATCH /absences/updateCertificate/${id} -- still missing
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `certificate`      | `boolean` | **Required**. Certificate (true or false) |
 
 #### Delete absence
 
