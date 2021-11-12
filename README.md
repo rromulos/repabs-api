@@ -196,7 +196,7 @@ Note: Routes are protected by a guard. So the Bearer token must be provided alwa
 #### Patch absence (update certificate)
 
 ```http
-  PATCH /absences/updateCertificate/${id} -- still missing
+  PATCH /absences/updateCertificate/${id}
 ```
 
 | Parameter | Type     | Description                       |
