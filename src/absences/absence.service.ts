@@ -152,6 +152,10 @@ export class AbsenceService{
         return await this.absenceRepository.updateApproved(id, approved);
     }    
 
+    async updateCertificate(id, certificate){
+        return await this.absenceRepository.updateCertificate(id, certificate);
+    }
+
     async delete(id: string){
         return await this.absenceRepository.delete(id);
     }    

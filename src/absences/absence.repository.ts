@@ -106,6 +106,12 @@ export class AbsenceRepository{
         absence.save();
     }
 
+    async updateCertificate(id, certificate){
+        const absence = await this.find(id);
+        absence.certificate = certificate;
+        absence.save();
+    }
+
     async delete(id: string){
         const result = await this.absenceModel.deleteOne({_id: id}).exec();
         if (result.deletedCount === 0){
