@@ -90,6 +90,15 @@ export class AbsenceController{
     }  
 
     @UseGuards(JwtAuthGuard)
+    @Patch('/updateCertificate/:id')
+    async updateCertificate(
+        @Param('id') id : string,
+        @Body('certificate') certificate : boolean
+    ) {
+        await this.absenceService.updateCertificate(id, certificate);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Delete(':id')
     async delete(@Param('id') id : string){
         return await this.absenceService.delete(id);
